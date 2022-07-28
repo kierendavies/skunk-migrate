@@ -20,4 +20,12 @@ object `skunk-migrate` extends ScalaModule {
   def ivyDeps = Agg(
     ivy"org.tpolecat::skunk-core:0.3.1"
   )
+
+  object test extends Tests {
+    def testFramework = "munit.Framework"
+
+    def ivyDeps = Agg(
+      ivy"org.scalameta::munit::0.7.29"
+    )
+  }
 }
