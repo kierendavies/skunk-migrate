@@ -1,8 +1,5 @@
 package skunk.migrate
 
-import scala.deriving.Mirror
-import scala.quoted.*
-
 import skunk.Session
 import skunk.Transaction
 
