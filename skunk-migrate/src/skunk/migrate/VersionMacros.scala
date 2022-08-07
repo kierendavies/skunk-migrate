@@ -17,13 +17,16 @@ object VersionMacros:
             try Instant.parse(timestamp)
             catch
               case e: DateTimeParseException =>
-                report.error(s"Invalid timestamp: $timestamp", Position.ofMacroExpansion)
-                throw e
+                report.errorAndAbort(
+                  s"Invalid timestamp: $timestamp",
+                  Position.ofMacroExpansion,
+                )
           (instant.getEpochSecond, name)
         case _ =>
-          val msg = "Class name must have the format `$timestamp__$name`"
-          report.error(msg, Position.ofMacroExpansion)
-          throw new Exception(msg)
+          report.errorAndAbort(
+            "Class name must have the format `$timestamp__$name`",
+            Position.ofMacroExpansion,
+          )
 
     '{
       new Version.FromClass[M]:
