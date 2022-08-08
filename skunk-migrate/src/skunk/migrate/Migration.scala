@@ -11,6 +11,4 @@ trait ReversibleMigration[F[_]] extends Migration[F]:
   def down(session: Session[F]): F[Unit]
 
 object Migration:
-  extension [M <: Migration[?]](migration: M)(using version: Version[M])
-    def timestamp: Long = version.timestamp(migration)
-    def name: String = version.name(migration)
+  extension [M <: Migration[?]](migration: M)(using version: Version[M]) def version: Long = version.version(migration)

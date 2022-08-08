@@ -5,14 +5,14 @@ import java.time.format.DateTimeParseException
 import scala.quoted.*
 
 object VersionMacros:
-  def fromClass[M <: Migration[?]: Type](using Quotes): Expr[Version.FromClass[M]] =
+  def fromClassTimestamp[M <: Migration[?]: Type](using Quotes): Expr[Version[M]] =
     import quotes.reflect.*
 
     val typeName = TypeRepr.of[M].typeSymbol.name.stripSuffix("$")
 
-    val (derivedTimestamp, derivedName) =
+    val derivedVersion =
       typeName match
-        case s"${timestamp}__${name}" =>
+        case s"${timestamp}__${_}" =>
           val instant =
             try Instant.parse(timestamp)
             catch
@@ -21,15 +21,14 @@ object VersionMacros:
                   s"Invalid timestamp: $timestamp",
                   Position.ofMacroExpansion,
                 )
-          (instant.getEpochSecond, name)
+          instant.getEpochSecond
         case _ =>
           report.errorAndAbort(
-            "Class name must have the format `$timestamp__$name`",
+            "Class name must start with `${timestamp}__`",
             Position.ofMacroExpansion,
           )
 
     '{
-      new Version.FromClass[M]:
-        def timestamp(migration: M): Long = ${ Expr(derivedTimestamp) }
-        def name(migration: M): String = ${ Expr(derivedName) }
+      new Version[M]:
+        def version(migration: M): Long = ${ Expr(derivedVersion) }
     }
