@@ -2,8 +2,7 @@ package skunk.migrate
 
 import cats.Eval
 import munit.FunSuite
-
-import testmigrations.*
+import skunk.migrate.testmigrations.*
 
 class MigrateSuite extends FunSuite:
   test("discover migrations") {

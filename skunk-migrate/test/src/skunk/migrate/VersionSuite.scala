@@ -1,8 +1,7 @@
 package skunk.migrate
 
 import munit.FunSuite
-
-import testmigrations.*
+import skunk.migrate.testmigrations.*
 
 class VersionSuite extends FunSuite:
   test("derive from class name") {
