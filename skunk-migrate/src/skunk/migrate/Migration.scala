@@ -3,8 +3,8 @@ package skunk.migrate
 import skunk.Session
 
 sealed trait Migration[F[_]]:
-  protected def derived$Version: Version[this.type]
-  def version: Long = derived$Version.underlying
+  protected given derived$Version: Version[this.type]
+  val version: Long = derived$Version.underlying
 
   def up(session: Session[F]): F[Unit]
 
