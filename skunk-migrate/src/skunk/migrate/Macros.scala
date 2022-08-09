@@ -10,25 +10,26 @@ object Macros:
 
     val typeName = TypeRepr.of[M].typeSymbol.name.stripSuffix("$")
 
-    val derivedVersion =
-      typeName match
-        case s"${timestamp}__${_}" =>
-          val instant =
-            try Instant.parse(timestamp)
-            catch
-              case e: DateTimeParseException =>
-                report.errorAndAbort(
-                  s"Invalid timestamp: $timestamp",
-                  Position.ofMacroExpansion,
-                )
-          instant.getEpochSecond
-        case _ =>
+    val timestamp = typeName match
+      case s"${timestamp}__${_}" => timestamp
+      case _ =>
+        report.errorAndAbort(
+          "Class name must start with `${timestamp}__`",
+          Position.ofMacroExpansion,
+        )
+
+    val version =
+      try Instant.parse(timestamp).getEpochSecond
+      catch
+        case e: DateTimeParseException =>
           report.errorAndAbort(
-            "Class name must start with `${timestamp}__`",
+            s"Invalid timestamp: $timestamp",
             Position.ofMacroExpansion,
           )
 
-    '{ Version[M](${ Expr(derivedVersion) }) }
+    val versionExpr = Expr(version)
+
+    '{ Version[M]($versionExpr) }
 
   def discoverMigrations[F[_]: Type](packageNameExpr: Expr[String])(using Quotes): Expr[List[Migration[F]]] =
     import quotes.reflect.*
