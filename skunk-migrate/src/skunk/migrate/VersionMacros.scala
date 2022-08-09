@@ -28,7 +28,4 @@ object VersionMacros:
             Position.ofMacroExpansion,
           )
 
-    '{
-      new Version[M]:
-        def version(migration: M): Long = ${ Expr(derivedVersion) }
-    }
+    '{ Version[M](${ Expr(derivedVersion) }) }
