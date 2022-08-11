@@ -40,7 +40,10 @@ object Macros:
     val packageName = packageNameExpr.valueOrAbort
     val packageSymbol = Symbol.requiredPackage(packageName)
 
-    val migrationSymbols = packageSymbol.fieldMembers.filter(_.typeRef <:< migrationTypeRepr)
+    val migrationSymbols =
+      packageSymbol.fieldMembers
+        .filter(_.typeRef <:< migrationTypeRepr)
+        .sortBy(_.name)
     if migrationSymbols.isEmpty then
       report.warning(s"No objects of type $migrationTypeName found in package $packageName")
 
