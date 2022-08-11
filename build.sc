@@ -25,7 +25,8 @@ object `skunk-migrate` extends ScalaModule {
     def testFramework = "munit.Framework"
 
     def ivyDeps = Agg(
-      ivy"org.scalameta::munit::0.7.29"
+      ivy"org.scalameta::munit::1.0.0-M6",
+      ivy"org.typelevel::munit-cats-effect:2.0.0-M1",
     )
   }
 }
