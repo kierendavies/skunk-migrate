@@ -71,3 +71,5 @@ jobs:
           --release true
           --sonatypeUri "https://s01.oss.sonatype.org/service/local"
           --sonatypeSnapshotUri "https://s01.oss.sonatype.org/content/repositories/snapshots"
+          --readTimeout 600000
+          --awaitTimeout 600000
