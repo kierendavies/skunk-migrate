@@ -1,7 +1,11 @@
+import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.2.0`
+
+import de.tobiasroeser.mill.vcs.version.VcsVersion
 import mill._
 import mill.scalalib._
+import mill.scalalib.publish._
 
-object `skunk-migrate` extends ScalaModule {
+object `skunk-migrate` extends ScalaModule with PublishModule {
   def scalaVersion = "3.2.0-RC3"
 
   def scalacOptions = Seq(
@@ -19,6 +23,23 @@ object `skunk-migrate` extends ScalaModule {
 
   def ivyDeps = Agg(
     ivy"org.tpolecat::skunk-core:0.3.1"
+  )
+
+  def publishVersion = T {
+    val vcsState = VcsVersion.vcsState()
+    val suffix = if (vcsState.commitsSinceLastTag == 0) "" else "-SNAPSHOT"
+    vcsState.format() + suffix
+  }
+
+  def pomSettings = PomSettings(
+    description = "Database migrations with Skunk",
+    organization = "io.github.kierendavies",
+    url = "https://github.com/kierendavies/skunk-migrate",
+    licenses = Seq(License.MIT),
+    versionControl = VersionControl.github("kierendavies", "skunk-migrate"),
+    developers = Seq(
+      Developer("kierendavies", "Kieren Davies", "https://github.com/kierendavies")
+    ),
   )
 
   object test extends Tests {
