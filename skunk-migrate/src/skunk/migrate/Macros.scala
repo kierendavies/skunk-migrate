@@ -8,15 +8,18 @@ object Macros:
   def derivedVersion[M <: Migration[?]: Type](using Quotes): Expr[Version[M]] =
     import quotes.reflect.*
 
-    val typeName = TypeRepr.of[M].typeSymbol.name.stripSuffix("$")
+    val classSymbol = TypeRepr.of[M].classSymbol match
+      case Some(s) => s
+      case None => report.errorAndAbort(s"No class symbol for type ${Type.show[M]}")
+    val className = classSymbol.name.stripSuffix("$")
 
-    val timestamp = typeName match
+    val timestampString = className match
       case s"${timestamp}__${_}" => timestamp
       case _ => report.errorAndAbort("Class name must start with `${timestamp}__`")
 
     val version =
-      try Instant.parse(timestamp).getEpochSecond
-      catch case e: DateTimeParseException => report.errorAndAbort(s"Invalid timestamp: $timestamp")
+      try Instant.parse(timestampString).getEpochSecond
+      catch case e: DateTimeParseException => report.errorAndAbort(s"Invalid timestamp: $timestampString")
 
     val versionExpr = Expr(version)
 
