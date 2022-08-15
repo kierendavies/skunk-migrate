@@ -18,9 +18,9 @@ class MigratorSuite extends CatsEffectSuite:
   inline val migrationsPackage = "skunk.migrate.testmigrations"
 
   val migrations: List[Migration[IO]] = List(
-    `2022-07-28T11:51:57Z__TestOne`,
-    `2022-08-08T10:22:41Z__TestTwo`,
-    `2022-08-10T13:19:10Z__TestThree`,
+    `20220728115157_TestOne`,
+    `20220808102241_TestTwo`,
+    `20220810131910_TestThree`,
   )
 
   def makeDB(schemaName: String): Resource[IO, Resource[IO, Session[IO]]] =

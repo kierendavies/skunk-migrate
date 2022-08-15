@@ -1,10 +1,15 @@
 package skunk.migrate
 
 import java.time.Instant
+import java.time.ZoneOffset
+import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
 import scala.quoted.*
 
 object Macros:
+  val migrationClassRegex = raw"(\d{14})_.*".r
+  val dateTimeFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss").withZone(ZoneOffset.UTC)
+
   def derivedVersion[M <: Migration[?]: Type](using Quotes): Expr[Version[M]] =
     import quotes.reflect.*
 
@@ -14,13 +19,15 @@ object Macros:
     val className = classSymbol.name.stripSuffix("$")
 
     val timestampString = className match
-      case s"${timestamp}__${_}" => timestamp
-      case _ => report.errorAndAbort("Class name must start with `${timestamp}__`")
+      case migrationClassRegex(t) => t
+      case _ => report.errorAndAbort("Class name must start with timestamp pattern `yyyyMMddHHmmss_`")
 
-    val version =
-      try Instant.parse(timestampString).getEpochSecond
-      catch case e: DateTimeParseException => report.errorAndAbort(s"Invalid timestamp: $timestampString")
+    val instant =
+      try Instant.from(dateTimeFormatter.parse(timestampString))
+      catch
+        case e: DateTimeParseException => report.errorAndAbort(s"Invalid yyyyMMddHHmmss timestamp: $timestampString")
 
+    val version = instant.getEpochSecond()
     val versionExpr = Expr(version)
 
     '{ Version[M]($versionExpr) }
