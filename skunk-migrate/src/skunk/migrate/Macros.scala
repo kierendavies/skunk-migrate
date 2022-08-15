@@ -12,20 +12,11 @@ object Macros:
 
     val timestamp = typeName match
       case s"${timestamp}__${_}" => timestamp
-      case _ =>
-        report.errorAndAbort(
-          "Class name must start with `${timestamp}__`",
-          Position.ofMacroExpansion,
-        )
+      case _ => report.errorAndAbort("Class name must start with `${timestamp}__`")
 
     val version =
       try Instant.parse(timestamp).getEpochSecond
-      catch
-        case e: DateTimeParseException =>
-          report.errorAndAbort(
-            s"Invalid timestamp: $timestamp",
-            Position.ofMacroExpansion,
-          )
+      catch case e: DateTimeParseException => report.errorAndAbort(s"Invalid timestamp: $timestamp")
 
     val versionExpr = Expr(version)
 
