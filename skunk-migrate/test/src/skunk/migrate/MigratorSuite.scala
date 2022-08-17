@@ -23,32 +23,39 @@ class MigratorSuite extends CatsEffectSuite:
     `20220810131910_TestThree`,
   )
 
-  def makeDB(schemaName: String): Resource[IO, Resource[IO, Session[IO]]] =
+  val sharedDB: Resource[IO, Resource[IO, Session[IO]]] =
     Session.pooled[IO](
       host = "localhost",
       port = 5432,
       user = "postgres",
       database = "postgres",
       max = 1,
-      parameters = Session.DefaultConnectionParameters + ("search_path" -> schemaName),
     )
 
-  val sharedDB = makeDB("public")
+  val genTempSchemaName: IO[String] =
+    for
+      rand <- Random.scalaUtilRandom[IO]
+      chars <- rand.nextAlphaNumeric.replicateA(5)
+    yield s"test_${chars.mkString}"
 
-  def makeTempSchema(db: Resource[IO, Session[IO]]): Resource[IO, String] =
-    Resource.make {
-      for
-        rand <- Random.scalaUtilRandom[IO]
-        chars <- rand.nextAlphaNumeric.replicateA(8)
-        schemaName = s"test_${chars.mkString}"
-        _ <- db.use(_.execute(sql"CREATE SCHEMA #$schemaName".command))
-      yield schemaName
-    } { schemaName =>
-      db.use(_.execute(sql"DROP SCHEMA #$schemaName CASCADE".command)).void
-    }
+  def makeTempSchema(db: Resource[IO, Session[IO]]): Resource[IO, Resource[IO, Session[IO]]] =
+    Resource
+      .make {
+        for
+          schemaName <- genTempSchemaName
+          _ <- db.use(_.execute(sql"CREATE SCHEMA #$schemaName".command))
+        yield schemaName
+      } { schemaName =>
+        db.use(_.execute(sql"DROP SCHEMA #$schemaName CASCADE".command)).void
+      }
+      .map { schemaName =>
+        db.evalTap { session =>
+          session.execute(sql"SET search_path TO #$schemaName".command)
+        }
+      }
 
   val tempDB: Resource[IO, Resource[IO, Session[IO]]] =
-    sharedDB >>= makeTempSchema >>= makeDB
+    sharedDB >>= makeTempSchema
 
   test("discoverMigrations") {
     assertEquals(
