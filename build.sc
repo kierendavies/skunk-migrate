@@ -6,7 +6,7 @@ import mill.scalalib._
 import mill.scalalib.publish._
 
 object `skunk-migrate` extends ScalaModule with PublishModule {
-  def scalaVersion = "3.2.0-RC3"
+  def scalaVersion = "3.2.0"
 
   def scalacOptions = Seq(
     "-deprecation",
