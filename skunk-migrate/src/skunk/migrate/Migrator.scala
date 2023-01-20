@@ -59,8 +59,7 @@ class Migrator[F[_]: MonadCancelThrow](
               ON CONFLICT (uniq) DO UPDATE SET version = EXCLUDED.version
             """.command
           )
-          .use(_.execute(v))
-          .void
+          .flatMap(_.execute(v).void)
 
       case None =>
         session
