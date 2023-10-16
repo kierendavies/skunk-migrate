@@ -22,7 +22,7 @@ object `skunk-migrate` extends ScalaModule with PublishModule {
   )
 
   def ivyDeps = Agg(
-    ivy"org.tpolecat::skunk-core:0.6.0"
+    ivy"org.tpolecat::skunk-core:0.6.1"
   )
 
   def publishVersion = T {
