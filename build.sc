@@ -1,4 +1,4 @@
-import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.3.1`
+import $ivy.`de.tototec::de.tobiasroeser.mill.vcs.version::0.4.0`
 
 import de.tobiasroeser.mill.vcs.version.VcsVersion
 import mill._
@@ -6,7 +6,7 @@ import mill.scalalib._
 import mill.scalalib.publish._
 
 object `skunk-migrate` extends ScalaModule with PublishModule {
-  def scalaVersion = "3.3.0"
+  def scalaVersion = "3.3.1"
 
   def scalacOptions = Seq(
     "-deprecation",
@@ -26,9 +26,7 @@ object `skunk-migrate` extends ScalaModule with PublishModule {
   )
 
   def publishVersion = T {
-    val vcsState = VcsVersion.vcsState()
-    val suffix = if (vcsState.commitsSinceLastTag == 0) "" else "-SNAPSHOT"
-    vcsState.format() + suffix
+    VcsVersion.vcsState().format(untaggedSuffix = "-SNAPSHOT")
   }
 
   def pomSettings = PomSettings(
@@ -42,7 +40,7 @@ object `skunk-migrate` extends ScalaModule with PublishModule {
     ),
   )
 
-  object test extends Tests {
+  object test extends ScalaTests {
     def testFramework = "munit.Framework"
 
     def ivyDeps = Agg(
