@@ -5,7 +5,7 @@ import cats.effect.Resource
 import cats.effect.std.Random
 import cats.syntax.all.*
 import munit.CatsEffectSuite
-import natchez.Trace
+import org.typelevel.otel4s.trace.Tracer
 import skunk.Session
 import skunk.codec.numeric.int8
 import skunk.exception.PostgresErrorException
@@ -13,7 +13,7 @@ import skunk.migrate.testmigrations.*
 import skunk.syntax.all.*
 
 class MigratorSuite extends CatsEffectSuite:
-  given Trace[IO] = Trace.Implicits.noop[IO]
+  given Tracer[IO] = Tracer.noop
 
   inline val migrationsPackage = "skunk.migrate.testmigrations"
 
