@@ -44,7 +44,7 @@ object `skunk-migrate` extends ScalaModule with PublishModule {
     def testFramework = "munit.Framework"
 
     def ivyDeps = Agg(
-      ivy"org.scalameta::munit::1.0.0-M11",
+      ivy"org.scalameta::munit::1.0.0-M12",
       ivy"org.typelevel::munit-cats-effect:2.0.0-M5",
     )
   }
