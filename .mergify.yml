@@ -16,6 +16,5 @@ pull_request_rules:
           - files=.scalafmt.conf
           - files=build.sc
     actions:
-      delete_head_branch: {}
       merge:
         method: merge
